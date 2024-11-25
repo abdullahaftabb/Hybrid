@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            height: auto;
+        }
+        .top-right-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .top-right-buttons a {
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .top-right-buttons a:hover {
+            background-color: #45a049;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        video {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        a.download-link {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        a.download-link:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <img class="logo" src="{{url_for('static', filename='qwerty.png')}}" />
+    
+    <!-- Top-right corner buttons -->
+    <div class="top-right-buttons">
+        <a href="{{ url_for('home') }}">Logout</a>
+        <a href="{{ url_for('wav2lip') }}">Return to Wav2Lip</a>
+    </div>
+    
+    <h1>Lip-Synced Video</h1>
+    <video width="640" height="360" controls src="/download/{{ result_video }}"></video>
+    <br>
+    <a class="download-link" href="/download/{{ result_video }}">Download Video</a>
+</body>
+</html>
