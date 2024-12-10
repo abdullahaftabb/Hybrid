@@ -167,33 +167,6 @@ def get_video_resolution(video_path):
     video.release()
     return (width, height)
 
-def resize_video(video_path, new_resolution):
-    """Resize a video to the given resolution."""
-    temp_dir = tempfile.mkdtemp()
-    temp_path = os.path.join(temp_dir, "temp_resized_video.mp4")
-    
-    video = cv2.VideoCapture(video_path)
-    if not video.isOpened():
-        print(f"Error opening video file: {video_path}")
-        return None
-    
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    fps = video.get(cv2.CAP_PROP_FPS)
-    width, height = new_resolution
-    writer = cv2.VideoWriter(temp_path, fourcc, fps, (width, height))
-    
-    while True:
-        success, frame = video.read()
-        if not success:
-            break
-        resized_frame = cv2.resize(frame, (width, height))
-        writer.write(resized_frame)
-    
-    video.release()
-    writer.release()
-    shutil.move(temp_path, video_path)
-    shutil.rmtree(temp_dir)
-    return video_path
 
 # Model URLs
 model_urls = {
