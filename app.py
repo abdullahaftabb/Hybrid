@@ -240,11 +240,59 @@ def get_video_resolution(video_path):
     cap.release()
     return (width, height)
 
-def resize_video(video_path, target_size):
-    """Resize video to target size"""
-    temp_path = video_path + "_temp.mp4"
-    os.system(f'ffmpeg -i {video_path} -vf scale={target_size[0]}:{target_size[1]} {temp_path}')
-    os.replace(temp_path, video_path)
+def resize_video(video_path, new_resolution):
+    """Function to resize a video and handle file replacement"""
+    temp_dir = tempfile.mkdtemp()  # Create a temporary directory
+    temp_path = os.path.join(temp_dir, "temp_resized_video.mp4")
+    backup_path = video_path + ".bak"  # Backup path for original file
+    
+    try:
+        # Open the original video
+        video = cv2.VideoCapture(video_path)
+        if not video.isOpened():
+            print(f"Error opening video file: {video_path}")
+            return None
+        
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for mp4 files
+        fps = video.get(cv2.CAP_PROP_FPS)
+        width, height = new_resolution
+        writer = cv2.VideoWriter(temp_path, fourcc, fps, (width, height))
+        
+        while True:
+            success, frame = video.read()
+            if not success:
+                break
+            resized_frame = cv2.resize(frame, (width, height))
+            writer.write(resized_frame)
+        
+        video.release()
+        writer.release()
+        
+        # Try to rename the original file
+        for attempt in range(5):  # Retry up to 5 times
+            try:
+                if os.path.exists(backup_path):
+                    os.remove(backup_path)  # Ensure backup file is not present
+                os.rename(video_path, backup_path)
+                break
+            except PermissionError as e:
+                print(f"Attempt {attempt+1}: Unable to rename the original file '{video_path}'. Error: {e}")
+                time.sleep(1)  # Wait a moment before retrying
+        
+        # Replace the original file with the resized video
+        try:
+            shutil.move(temp_path, video_path)
+        except PermissionError as e:
+            print(f"Unable to replace the original file '{video_path}' with the resized video. Error: {e}")
+            return None
+        
+        # Clean up temporary directory
+        shutil.rmtree(temp_dir)
+        
+        return video_path
+    except Exception as e:
+        print(f"Error during video processing: {e}")
+        return None
 
 def extract_frames(video_path, output_dir):
     """Extract frames from video"""
